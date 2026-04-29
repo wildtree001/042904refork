@@ -41,9 +41,7 @@
       <!-- 功能内容区域 -->
       <div class="feature-content">
         <transition name="fade" mode="out-in">
-          <SkillRadar v-if="activeTab === 'radar'" key="radar" />
-          <CodeEditor v-if="activeTab === 'editor'" key="editor" />
-          <PuzzleGame v-if="activeTab === 'puzzle'" key="puzzle" />
+          <component :is="currentComponent" :key="activeTab" />
         </transition>
       </div>
 
@@ -59,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { transitionName, canTransition, recordTransition } from '@/utils/transition'
 import SkillRadar from '@/components/SkillRadar.vue'
@@ -70,6 +68,19 @@ import '@/styles/DeepExplore.css'
 const router = useRouter()
 const navigated = ref(false)
 const activeTab = ref<'radar' | 'editor' | 'puzzle'>('radar')
+
+const currentComponent = computed(() => {
+  switch (activeTab.value) {
+    case 'radar':
+      return SkillRadar
+    case 'editor':
+      return CodeEditor
+    case 'puzzle':
+      return PuzzleGame
+    default:
+      return SkillRadar
+  }
+})
 
 function goBack() {
   if (navigated.value || !canTransition()) return
