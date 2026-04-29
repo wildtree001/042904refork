@@ -19,14 +19,18 @@
         </div>
         <div class="control-group">
           <label>
-            <el-checkbox v-model="breathAnimation" @change="toggleBreathAnimation">呼吸动画</el-checkbox>
+            <el-checkbox v-model="breathAnimation">呼吸动画</el-checkbox>
           </label>
         </div>
       </div>
     </div>
 
     <div class="radar-main">
-      <div ref="chartRef" class="chart-container"></div>
+      <div
+        ref="chartRef"
+        class="chart-container"
+        :class="{ 'breathing': breathAnimation }"
+      ></div>
     </div>
 
     <div class="timeline-section">
@@ -113,7 +117,11 @@
             <span v-if="compareMode" class="compare"> / {{ getSkillValue(skill.name, compareTimeIndex) }}</span>
           </div>
           <div class="skill-bar">
-            <div class="skill-bar-fill" :style="{ width: getSkillValue(skill.name, currentTimeIndex) + '%' }"></div>
+            <div
+              class="skill-bar-fill"
+              :style="{ width: getSkillValue(skill.name, currentTimeIndex) + '%' }"
+              :class="{ 'breathing-bar': breathAnimation }"
+            ></div>
           </div>
         </div>
       </div>
@@ -135,12 +143,10 @@ interface SkillData {
   values: number[]
 }
 
+type ThemeKey = 'dark' | 'light' | 'blue' | 'purple'
+
 const chartRef = ref<HTMLElement | null>(null)
 let chartInstance: echarts.ECharts | null = null
-let animationFrameId: number | null = null
-let breathPhase = 0
-
-type ThemeKey = 'dark' | 'light' | 'blue' | 'purple'
 
 const currentTheme = ref<ThemeKey>('dark')
 const compareMode = ref(false)
@@ -213,6 +219,8 @@ const skillColors: Record<string, string> = {
   Python: '#3776ab',
 }
 
+const colors = computed(() => themeColors[currentTheme.value])
+
 function formatTimePeriod(period: TimePeriod | undefined): string {
   if (!period) return ''
   return `${period.year}年${period.month}月`
@@ -227,54 +235,7 @@ function getSkillColor(skillName: string): string {
   return skillColors[skillName] || '#666'
 }
 
-const colors = computed(() => themeColors[currentTheme.value as keyof typeof themeColors])
-
 function updateTheme() {
-  updateChart()
-}
-
-function toggleBreathAnimation() {
-  if (breathAnimation.value) {
-    startBreathAnimation()
-  } else {
-    stopBreathAnimation()
-    updateChart()
-  }
-}
-
-function startBreathAnimation() {
-  if (animationFrameId) {
-    cancelAnimationFrame(animationFrameId)
-  }
-
-  function animate() {
-    breathPhase += 0.02
-    if (breathPhase > Math.PI * 2) {
-      breathPhase = 0
-    }
-    updateChartWithBreath()
-    if (breathAnimation.value) {
-      animationFrameId = requestAnimationFrame(animate)
-    }
-  }
-
-  animate()
-}
-
-function stopBreathAnimation() {
-  if (animationFrameId) {
-    cancelAnimationFrame(animationFrameId)
-    animationFrameId = null
-  }
-}
-
-function getBreathScale(): number {
-  if (!breathAnimation.value) return 1
-  return 1 + Math.sin(breathPhase) * 0.03
-}
-
-function updateChartWithBreath() {
-  if (!chartInstance) return
   updateChart()
 }
 
@@ -282,16 +243,15 @@ function updateChart() {
   if (!chartInstance || !chartRef.value) return
 
   const c = colors.value
-  const breathScale = getBreathScale()
 
-  const radarData = [
+  const radarData: any[] = [
     {
       name: formatTimePeriod(timePeriods[currentTimeIndex.value]),
-      value: skills.map((skill) => (skill.values[currentTimeIndex.value] ?? 0) * breathScale),
+      value: skills.map((skill) => skill.values[currentTimeIndex.value] ?? 0),
       areaStyle: {
         color: new echarts.graphic.RadialGradient(0.5, 0.5, 0.5, [
-          { offset: 0, color: c.primary + '40' },
-          { offset: 1, color: c.primary + '20' },
+          { offset: 0, color: c.primary + '60' },
+          { offset: 1, color: c.primary + '30' },
         ]),
       },
       lineStyle: {
@@ -310,8 +270,8 @@ function updateChart() {
       value: skills.map((skill) => skill.values[compareTimeIndex.value] ?? 0),
       areaStyle: {
         color: new echarts.graphic.RadialGradient(0.5, 0.5, 0.5, [
-          { offset: 0, color: c.secondary + '40' },
-          { offset: 1, color: c.secondary + '20' },
+          { offset: 0, color: c.secondary + '60' },
+          { offset: 1, color: c.secondary + '30' },
         ]),
       },
       lineStyle: {
@@ -322,7 +282,7 @@ function updateChart() {
       itemStyle: {
         color: c.secondary,
       },
-    } as any)
+    })
   }
 
   const option: echarts.EChartsOption = {
@@ -381,9 +341,15 @@ function updateChart() {
         name: '技能雷达',
         type: 'radar',
         data: radarData,
+        animation: true,
+        animationDuration: 1000,
+        animationEasing: 'elasticOut',
         emphasis: {
           lineStyle: {
-            width: 4,
+            width: 5,
+          },
+          areaStyle: {
+            opacity: 0.8,
           },
         },
       },
@@ -397,23 +363,37 @@ function handleResize() {
   chartInstance?.resize()
 }
 
-watch([currentTimeIndex, compareTimeIndex, compareMode], () => {
+watch([currentTimeIndex, compareTimeIndex, compareMode, currentTheme], () => {
   updateChart()
+})
+
+watch(breathAnimation, () => {
+  if (chartInstance && chartRef.value) {
+    if (breathAnimation.value) {
+      chartInstance.dispatchAction({
+        type: 'highlight',
+        seriesIndex: 0,
+        dataIndex: 0,
+      })
+    } else {
+      chartInstance.dispatchAction({
+        type: 'downplay',
+        seriesIndex: 0,
+        dataIndex: 0,
+      })
+    }
+  }
 })
 
 onMounted(() => {
   if (chartRef.value) {
     chartInstance = echarts.init(chartRef.value)
     updateChart()
-    if (breathAnimation.value) {
-      startBreathAnimation()
-    }
     window.addEventListener('resize', handleResize)
   }
 })
 
 onBeforeUnmount(() => {
-  stopBreathAnimation()
   chartInstance?.dispose()
   window.removeEventListener('resize', handleResize)
 })
@@ -422,7 +402,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .skill-radar-container {
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   padding: 20px;
   overflow-y: auto;
   background: linear-gradient(135deg, var(--bg-color, #1a1a2e) 0%, var(--bg-color-dark, #16213e) 100%);
@@ -464,17 +444,38 @@ onBeforeUnmount(() => {
 
 .radar-main {
   width: 100%;
-  height: 400px;
+  min-height: 400px;
+  height: auto;
   margin-bottom: 20px;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .chart-container {
   width: 100%;
-  height: 100%;
+  height: 400px;
+  transition: all 0.3s ease;
+}
+
+.chart-container.breathing {
+  animation: breathe 3s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+  }
 }
 
 .timeline-section {
@@ -592,6 +593,7 @@ onBeforeUnmount(() => {
   justify-content: center;
   gap: 30px;
   margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
 .legend-item {
@@ -663,17 +665,33 @@ onBeforeUnmount(() => {
 }
 
 .skill-bar {
-  height: 6px;
+  height: 8px;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
+  border-radius: 4px;
   overflow: hidden;
 }
 
 .skill-bar-fill {
   height: 100%;
   background: linear-gradient(90deg, #ff6b9d 0%, #c44ae0 100%);
-  border-radius: 3px;
+  border-radius: 4px;
   transition: width 0.5s ease;
+}
+
+.skill-bar-fill.breathing-bar {
+  animation: barBreathe 2s ease-in-out infinite;
+}
+
+@keyframes barBreathe {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 5px #ff6b9d;
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 15px #ff6b9d, 0 0 25px #c44ae0;
+  }
 }
 
 @media (max-width: 768px) {
@@ -696,7 +714,12 @@ onBeforeUnmount(() => {
   }
 
   .radar-main {
-    height: 300px;
+    min-height: 300px;
+    padding: 10px;
+  }
+
+  .chart-container {
+    height: 280px;
   }
 
   .skills-grid {

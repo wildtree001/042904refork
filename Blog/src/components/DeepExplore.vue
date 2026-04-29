@@ -140,7 +140,7 @@ function goBack() {
   position: relative;
   z-index: 1;
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   padding: 20px;
@@ -213,13 +213,11 @@ function goBack() {
 /* 功能内容区域 */
 .feature-content {
   flex: 1;
-  min-height: 0;
   background: rgba(255, 255, 255, 0.02);
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  overflow: visible;
+  min-height: 500px;
 }
 
 /* 过渡动画 */

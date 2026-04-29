@@ -563,7 +563,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .puzzle-game-container {
   width: 100%;
-  height: 100%;
+  min-height: 600px;
   padding: 20px;
   overflow-y: auto;
   background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
