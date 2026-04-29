@@ -23,6 +23,21 @@ const router = createRouter({
       name: 'Explore',
       component: () => import('../components/DeepExplore.vue'),
     },
+    {
+      path: '/music',
+      name: 'MusicPlayer',
+      component: () => import('../components/MusicPlayer.vue'),
+    },
+    {
+      path: '/globe',
+      name: 'Globe3D',
+      component: () => import('../components/Globe3D.vue'),
+    },
+    {
+      path: '/whiteboard',
+      name: 'Whiteboard',
+      component: () => import('../components/Whiteboard.vue'),
+    },
   ],
 })
 
