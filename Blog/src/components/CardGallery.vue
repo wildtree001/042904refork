@@ -19,25 +19,24 @@
         :style="getCardStyle(index)"
         @mouseenter="onCardHover(index)"
         @mouseleave="onCardLeave(index)"
-        @click="flipCard(index)"
+        @click="onCardClick(index)"
       >
         <div 
           class="card" 
-          :class="{ 'flipped': flippedCards.includes(index), 'hovered': hoveredCards.includes(index) }"
+          :class="{ 'flipped': flippedCardIndex === index, 'hovered': hoveredCardIndex === index }"
           :style="{ '--index': index }"
         >
           <div class="card-face card-front">
-            <div class="card-image" :style="{ background: card.gradient }"></div>
+            <div class="card-image" :style="{ background: card.gradient }">
+              <div class="card-image-inner layer-element" data-layer="1"></div>
+            </div>
             <div class="card-content">
-              <h3 class="card-title">{{ card.title }}</h3>
-              <p class="card-description">{{ card.description }}</p>
-              <div class="card-tags">
+              <h3 class="card-title layer-element" data-layer="3">{{ card.title }}</h3>
+              <p class="card-description layer-element" data-layer="2">{{ card.description }}</p>
+              <div class="card-tags layer-element" data-layer="1">
                 <span class="tag" v-for="tag in card.tags" :key="tag">{{ tag }}</span>
               </div>
             </div>
-            <div class="card-layer layer-1"></div>
-            <div class="card-layer layer-2"></div>
-            <div class="card-layer layer-3"></div>
           </div>
           
           <div class="card-face card-back">
@@ -57,7 +56,7 @@
                   <div class="detail-value full-description">{{ card.fullDescription }}</div>
                 </div>
               </div>
-              <button class="back-button" @click.stop="flipCard(index)">返回</button>
+              <button class="back-button" @click.stop="flipToFront(index)">返回</button>
             </div>
           </div>
         </div>
@@ -92,12 +91,16 @@ const rotationX = ref(0)
 const rotationY = ref(0)
 const scale = ref(1)
 const isDragging = ref(false)
+const wasDragged = ref(false)
+const dragStartX = ref(0)
+const dragStartY = ref(0)
 const lastMouseX = ref(0)
 const lastMouseY = ref(0)
-const flippedCards = ref<number[]>([])
-const hoveredCards = ref<number[]>([])
+const flippedCardIndex = ref<number | null>(null)
+const hoveredCardIndex = ref<number | null>(null)
 const mouseX = ref(0)
 const mouseY = ref(0)
+const mouseMoveSinceDown = ref(0)
 
 const cards = reactive<Card[]>([
   {
@@ -167,13 +170,20 @@ const parallaxStyle = computed(() => ({
 }))
 
 function getCardStyle(index: number) {
-  const baseRotationY = (index - cards.length / 2) * 30
-  const baseX = (index - cards.length / 2) * 250
-  const baseZ = Math.abs(index - cards.length / 2) * -50
+  const totalCards = cards.length
+  const centerOffset = index - totalCards / 2 + 0.5
+  
+  const angle = centerOffset * 25
+  const radius = 350
+  const xPos = Math.sin(angle * Math.PI / 180) * radius
+  const zPos = -Math.cos(angle * Math.PI / 180) * radius + radius
+  
+  const hoverScale = hoveredCardIndex.value === index ? 1.1 : 1
+  const hoverZBoost = hoveredCardIndex.value === index ? 100 : 0
   
   return {
-    transform: `translateX(${baseX}px) translateZ(${baseZ}px) rotateY(${baseRotationY + rotationY.value}deg) rotateX(${rotationX.value}deg) scale(${scale.value})`,
-    zIndex: hoveredCards.value.includes(index) ? 100 : 50 - Math.abs(index - cards.length / 2)
+    transform: `translate3d(${xPos}px, 0, ${zPos + hoverZBoost}px) rotateY(${angle + rotationY.value}deg) rotateX(${rotationX.value}deg) scale(${scale.value * hoverScale})`,
+    zIndex: hoveredCardIndex.value === index ? 1000 : Math.round(100 + zPos)
   }
 }
 
@@ -188,10 +198,16 @@ function onMouseMove(e: MouseEvent) {
     const deltaX = e.clientX - lastMouseX.value
     const deltaY = e.clientY - lastMouseY.value
     
-    rotationY.value += deltaX * 0.5
-    rotationX.value -= deltaY * 0.5
+    mouseMoveSinceDown.value += Math.abs(deltaX) + Math.abs(deltaY)
     
-    rotationX.value = Math.max(-45, Math.min(45, rotationX.value))
+    if (mouseMoveSinceDown.value > 5) {
+      wasDragged.value = true
+    }
+    
+    rotationY.value += deltaX * 0.3
+    rotationX.value -= deltaY * 0.3
+    
+    rotationX.value = Math.max(-30, Math.min(30, rotationX.value))
     
     lastMouseX.value = e.clientX
     lastMouseY.value = e.clientY
@@ -200,8 +216,13 @@ function onMouseMove(e: MouseEvent) {
 
 function onMouseDown(e: MouseEvent) {
   isDragging.value = true
+  wasDragged.value = false
+  mouseMoveSinceDown.value = 0
+  dragStartX.value = e.clientX
+  dragStartY.value = e.clientY
   lastMouseX.value = e.clientX
   lastMouseY.value = e.clientY
+  
   if (galleryRef.value) {
     galleryRef.value.style.cursor = 'grabbing'
   }
@@ -209,6 +230,7 @@ function onMouseDown(e: MouseEvent) {
 
 function onMouseUp() {
   isDragging.value = false
+  
   if (galleryRef.value) {
     galleryRef.value.style.cursor = 'grab'
   }
@@ -217,24 +239,32 @@ function onMouseUp() {
 function onWheel(e: WheelEvent) {
   e.preventDefault()
   const delta = e.deltaY > 0 ? -0.05 : 0.05
-  scale.value = Math.max(0.5, Math.min(2, scale.value + delta))
+  scale.value = Math.max(0.6, Math.min(1.5, scale.value + delta))
 }
 
 function onCardHover(index: number) {
-  if (!hoveredCards.value.includes(index)) {
-    hoveredCards.value.push(index)
+  hoveredCardIndex.value = index
+}
+
+function onCardLeave(_index?: number) {
+  hoveredCardIndex.value = null
+}
+
+function onCardClick(index: number) {
+  if (wasDragged.value || mouseMoveSinceDown.value > 10) {
+    return
   }
+  
+  if (flippedCardIndex.value === index) {
+    return
+  }
+  
+  flippedCardIndex.value = index
 }
 
-function onCardLeave(index: number) {
-  hoveredCards.value = hoveredCards.value.filter(i => i !== index)
-}
-
-function flipCard(index: number) {
-  if (flippedCards.value.includes(index)) {
-    flippedCards.value = flippedCards.value.filter(i => i !== index)
-  } else {
-    flippedCards.value = [index]
+function flipToFront(index: number) {
+  if (flippedCardIndex.value === index) {
+    flippedCardIndex.value = null
   }
 }
 
@@ -242,8 +272,8 @@ function resetView() {
   rotationX.value = 0
   rotationY.value = 0
   scale.value = 1
-  flippedCards.value = []
-  hoveredCards.value = []
+  flippedCardIndex.value = null
+  hoveredCardIndex.value = null
 }
 
 onMounted(() => {
