@@ -171,19 +171,19 @@ const parallaxStyle = computed(() => ({
 
 function getCardStyle(index: number) {
   const totalCards = cards.length
-  const centerOffset = index - totalCards / 2 + 0.5
+  const cardWidth = 220
+  const cardGap = 30
+  const centerOffset = index - (totalCards - 1) / 2
   
-  const angle = centerOffset * 25
-  const radius = 350
-  const xPos = Math.sin(angle * Math.PI / 180) * radius
-  const zPos = -Math.cos(angle * Math.PI / 180) * radius + radius
+  const xPos = centerOffset * (cardWidth + cardGap)
+  const baseRotationY = centerOffset * 5
   
-  const hoverScale = hoveredCardIndex.value === index ? 1.1 : 1
-  const hoverZBoost = hoveredCardIndex.value === index ? 100 : 0
+  const hoverScale = hoveredCardIndex.value === index ? 1.05 : 1
+  const hoverZBoost = hoveredCardIndex.value === index ? 50 : 0
   
   return {
-    transform: `translate3d(${xPos}px, 0, ${zPos + hoverZBoost}px) rotateY(${angle + rotationY.value}deg) rotateX(${rotationX.value}deg) scale(${scale.value * hoverScale})`,
-    zIndex: hoveredCardIndex.value === index ? 1000 : Math.round(100 + zPos)
+    transform: `translate3d(${xPos}px, 0, ${hoverZBoost}px) rotateY(${baseRotationY + rotationY.value}deg) rotateX(${rotationX.value}deg) scale(${scale.value * hoverScale})`,
+    zIndex: hoveredCardIndex.value === index ? 1000 : 50 - Math.abs(centerOffset)
   }
 }
 
