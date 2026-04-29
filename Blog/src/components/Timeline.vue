@@ -321,6 +321,15 @@ function onYearSelectChange(e: Event) {
   const target = e.target as HTMLSelectElement
   if (target && target.value !== undefined) {
     selectedYear.value = target.value
+    expandedIndex.value = null
+    
+    if (containerRef.value) {
+      containerRef.value.scrollTop = 0
+    }
+    
+    nextTick(() => {
+      updateScrollProgress()
+    })
   }
 }
 

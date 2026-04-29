@@ -41,6 +41,7 @@
         <div class="action-buttons">
           <button class="btn btn-primary" @click="goToExplore">深入探索</button>
           <button class="btn btn-secondary" @click="goToAbout">关于我</button>
+          <button class="btn btn-features" @click="goToFeatures">交互组件</button>
         </div>
       </div>
 
@@ -92,6 +93,14 @@ function goToAbout() {
   recordTransition()
   transitionName.value = 'slide-up'
   router.push({ name: 'About' })
+}
+
+function goToFeatures() {
+  if (navigated.value || !canTransition()) return
+  navigated.value = true
+  recordTransition()
+  transitionName.value = 'slide-up'
+  router.push({ name: 'Features' })
 }
 
 function onWheel(e: WheelEvent) {
