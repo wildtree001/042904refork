@@ -22,10 +22,13 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
     "@tsparticles/vue3": "^3.0.1",
+    "echarts": "^6.0.0",
     "element-plus": "^2.11.8",
+    "monaco-editor": "^0.55.1",
     "pinia": "^3.0.3",
     "tsparticles": "^2.12.0",
     "vue": "^3.5.22",
+    "vue-echarts": "^8.0.1",
     "vue-router": "^4.6.3"
   },
   "devDependencies": {
@@ -49,7 +52,7 @@
     "jsdom": "^27.0.1",
     "npm-run-all2": "^8.0.4",
     "oxlint": "~1.23.0",
-    "prettier": "3.6.2",
+    "prettier": "^3.6.2",
     "typescript": "~5.9.0",
     "vite": "npm:rolldown-vite@latest",
     "vite-plugin-vue-devtools": "^8.0.3",
