@@ -52,54 +52,6 @@
       </div>
     </div>
 
-    <!-- 功能卡片区域 -->
-    <div class="features-section">
-      <h2 class="features-title">
-        <span
-          class="feature-char"
-          v-for="(char, index) in featuresTitleChars"
-          :key="`feature-${index}`"
-          :style="{ '--char-delay': index * 0.05 + 's' }"
-        >
-          {{ char }}
-        </span>
-      </h2>
-      <div class="features-grid">
-        <div class="feature-card music-card" @click="goToMusicPlayer">
-          <div class="feature-icon">🎵</div>
-          <h3 class="feature-name">音乐可视化播放器</h3>
-          <p class="feature-desc">集成Web Audio API，支持频谱分析、动态可视化效果、播放列表管理、自定义主题、歌词同步显示</p>
-          <div class="feature-tags">
-            <span class="tag">Web Audio API</span>
-            <span class="tag">频谱分析</span>
-            <span class="tag">歌词同步</span>
-          </div>
-        </div>
-
-        <div class="feature-card globe-card" @click="goToGlobe3D">
-          <div class="feature-icon">🌍</div>
-          <h3 class="feature-name">3D地球仪展示</h3>
-          <p class="feature-desc">使用Three.js实现3D地球，支持旋转缩放、国家高亮显示信息、时区显示、天气信息展示</p>
-          <div class="feature-tags">
-            <span class="tag">Three.js</span>
-            <span class="tag">3D渲染</span>
-            <span class="tag">时区天气</span>
-          </div>
-        </div>
-
-        <div class="feature-card whiteboard-card" @click="goToWhiteboard">
-          <div class="feature-icon">🎨</div>
-          <h3 class="feature-name">在线白板协作</h3>
-          <p class="feature-desc">Canvas白板，支持多人实时绘画、画笔/形状/文字/图片工具、图层管理、撤销/重做、导出PDF/图片</p>
-          <div class="feature-tags">
-            <span class="tag">Canvas</span>
-            <span class="tag">图层管理</span>
-            <span class="tag">PDF导出</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- 向下滚动提示 -->
     <div class="scroll-hint" @click="goToAbout">
       <div class="scroll-indicator">
@@ -119,11 +71,9 @@ import { transitionName, canTransition, recordTransition } from '@/utils/transit
 const router = useRouter()
 const title = '欢迎来到我的博客'
 const subtitle = '探索技术的无限可能'
-const featuresTitle = '功能展示'
 
 const titleChars = computed(() => title.split(''))
 const subtitleChars = computed(() => subtitle.split(''))
-const featuresTitleChars = computed(() => featuresTitle.split(''))
 
 const navigated = ref(false)
 let touchStartY = 0
@@ -142,30 +92,6 @@ function goToAbout() {
   recordTransition()
   transitionName.value = 'slide-up'
   router.push({ name: 'About' })
-}
-
-function goToMusicPlayer() {
-  if (navigated.value || !canTransition()) return
-  navigated.value = true
-  recordTransition()
-  transitionName.value = 'slide-up'
-  router.push({ name: 'MusicPlayer' })
-}
-
-function goToGlobe3D() {
-  if (navigated.value || !canTransition()) return
-  navigated.value = true
-  recordTransition()
-  transitionName.value = 'slide-up'
-  router.push({ name: 'Globe3D' })
-}
-
-function goToWhiteboard() {
-  if (navigated.value || !canTransition()) return
-  navigated.value = true
-  recordTransition()
-  transitionName.value = 'slide-up'
-  router.push({ name: 'Whiteboard' })
 }
 
 function onWheel(e: WheelEvent) {
