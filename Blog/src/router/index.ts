@@ -23,6 +23,26 @@ const router = createRouter({
       name: 'Explore',
       component: () => import('../components/DeepExplore.vue'),
     },
+    {
+      path: '/features',
+      name: 'Features',
+      component: () => import('../components/FeaturesHub.vue'),
+    },
+    {
+      path: '/gallery',
+      name: 'Gallery',
+      component: () => import('../components/CardGallery.vue'),
+    },
+    {
+      path: '/signature',
+      name: 'Signature',
+      component: () => import('../components/SignaturePad.vue'),
+    },
+    {
+      path: '/timeline',
+      name: 'Timeline',
+      component: () => import('../components/Timeline.vue'),
+    },
   ],
 })
 
