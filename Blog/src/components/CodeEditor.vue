@@ -742,12 +742,12 @@ onBeforeUnmount(() => {
 <style scoped>
 .code-editor-container {
   width: 100%;
-  height: 100%;
+  min-height: 600px;
   display: flex;
   flex-direction: column;
   padding: 20px;
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .header {
@@ -789,8 +789,7 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  overflow: hidden;
-  min-height: 0;
+  min-height: 400px;
 }
 
 .editor-section {
@@ -800,8 +799,7 @@ onBeforeUnmount(() => {
   background: rgba(255, 255, 255, 0.03);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  overflow: hidden;
-  min-height: 200px;
+  min-height: 300px;
 }
 
 .editor-header,
@@ -833,7 +831,8 @@ onBeforeUnmount(() => {
 
 .editor-container {
   flex: 1;
-  min-height: 0;
+  min-height: 300px;
+  height: 400px;
 }
 
 .preview-section {
@@ -842,7 +841,6 @@ onBeforeUnmount(() => {
   background: rgba(255, 255, 255, 0.03);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  overflow: hidden;
   min-height: 150px;
   max-height: 300px;
 }
