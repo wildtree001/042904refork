@@ -673,6 +673,10 @@ onUnmounted(() => {
   position: relative;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow: hidden;
+  --theme-primary: #667eea;
+  --theme-secondary: #764ba2;
+  --theme-primary-rgb: 102, 126, 234;
+  --theme-secondary-rgb: 118, 75, 162;
 }
 
 .visualizer-container {
@@ -812,7 +816,7 @@ onUnmounted(() => {
 
 .progress {
   height: 100%;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, var(--theme-primary), var(--theme-secondary));
   border-radius: 2px;
   position: relative;
 }
@@ -868,19 +872,19 @@ onUnmounted(() => {
 }
 
 .control-btn .active {
-  color: #667eea;
+  color: var(--theme-primary);
 }
 
 .play-btn {
   width: 70px;
   height: 70px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
   font-size: 32px;
 }
 
 .play-btn:hover {
   transform: scale(1.1);
-  background: linear-gradient(135deg, #7c8ff0, #8a5bb8);
+  filter: brightness(1.15);
 }
 
 .volume-control {
@@ -966,7 +970,7 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, var(--theme-primary), var(--theme-secondary));
 }
 
 .sidebar-content {
@@ -1002,7 +1006,7 @@ onUnmounted(() => {
 
 .add-btn {
   padding: 8px 16px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
   border: none;
   color: white;
   border-radius: 20px;
@@ -1013,7 +1017,7 @@ onUnmounted(() => {
 
 .add-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 5px 15px rgba(var(--theme-primary-rgb), 0.4);
 }
 
 .track-list {
@@ -1037,7 +1041,7 @@ onUnmounted(() => {
 }
 
 .track-item.active {
-  background: rgba(102, 126, 234, 0.2);
+  background: rgba(var(--theme-primary-rgb), 0.2);
 }
 
 .track-number {
@@ -1048,7 +1052,7 @@ onUnmounted(() => {
 }
 
 .track-item.active .track-number {
-  color: #667eea;
+  color: var(--theme-primary);
 }
 
 .track-thumb {
@@ -1078,7 +1082,7 @@ onUnmounted(() => {
 }
 
 .track-item.active .track-name {
-  color: #667eea;
+  color: var(--theme-primary);
 }
 
 .track-artist {
@@ -1176,6 +1180,7 @@ onUnmounted(() => {
   background: rgba(0, 0, 0, 0.2);
   opacity: 0;
   transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
 .theme-item:hover::before {
@@ -1197,7 +1202,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #667eea;
+  color: var(--theme-primary);
   font-weight: bold;
 }
 
@@ -1274,8 +1279,8 @@ onUnmounted(() => {
 }
 
 .upload-area:hover {
-  border-color: #667eea;
-  background: rgba(102, 126, 234, 0.1);
+  border-color: var(--theme-primary);
+  background: rgba(var(--theme-primary-rgb), 0.1);
 }
 
 .upload-icon {
@@ -1331,7 +1336,7 @@ onUnmounted(() => {
   width: 100%;
   margin-top: 15px;
   padding: 12px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
   border: none;
   color: white;
   border-radius: 8px;
@@ -1343,37 +1348,49 @@ onUnmounted(() => {
 
 .confirm-add-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 5px 15px rgba(var(--theme-primary-rgb), 0.4);
 }
 
 .theme-purple {
   --theme-primary: #667eea;
   --theme-secondary: #764ba2;
+  --theme-primary-rgb: 102, 126, 234;
+  --theme-secondary-rgb: 118, 75, 162;
 }
 
 .theme-blue {
   --theme-primary: #2193b0;
   --theme-secondary: #6dd5ed;
+  --theme-primary-rgb: 33, 147, 176;
+  --theme-secondary-rgb: 109, 213, 237;
 }
 
 .theme-green {
   --theme-primary: #11998e;
   --theme-secondary: #38ef7d;
+  --theme-primary-rgb: 17, 153, 142;
+  --theme-secondary-rgb: 56, 239, 125;
 }
 
 .theme-orange {
   --theme-primary: #f093fb;
   --theme-secondary: #f5576c;
+  --theme-primary-rgb: 240, 147, 251;
+  --theme-secondary-rgb: 245, 87, 108;
 }
 
 .theme-dark {
   --theme-primary: #232526;
   --theme-secondary: #414345;
+  --theme-primary-rgb: 35, 37, 38;
+  --theme-secondary-rgb: 65, 67, 69;
 }
 
 .theme-pink {
   --theme-primary: #ff9a9e;
   --theme-secondary: #fecfef;
+  --theme-primary-rgb: 255, 154, 158;
+  --theme-secondary-rgb: 254, 207, 239;
 }
 
 @media (max-width: 1200px) {
